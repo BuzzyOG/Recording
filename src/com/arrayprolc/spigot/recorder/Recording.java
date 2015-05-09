@@ -9,12 +9,16 @@ import java.util.HashMap;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
-public class Recording {
+public class Recording implements Listener {
 
-    private ArrayList<Location> locs = new ArrayList<Location>();
+    private ArrayList<String> locs = new ArrayList<String>();
 
     public static final HashMap<String, Recording> current = new HashMap<String, Recording>();
 
@@ -26,6 +30,7 @@ public class Recording {
 
     @SuppressWarnings("deprecation")
     public void startRecording() {
+        Bukkit.getServer().getPluginManager().registerEvents(this, RecordingMain.getInstance());
         runnable = Bukkit.getScheduler().runTaskTimer(RecordingMain.getInstance(), new BukkitRunnable() {
             public void run() {
                 if (!player.isOnline()) {
@@ -33,10 +38,10 @@ public class Recording {
                     this.cancel();
                     return;
                 }
-                locs.add(player.getLocation());
+                locs.add(new BoxedLocation(player.getLocation()).toString());
             }
         }, 0, 1);
-        System.out.println("[Rec] Started recording" + fileName + ".dem.");
+        System.out.println("[Rec] Started recording " + fileName + ".dem.");
     }
 
     public void destroy() {
@@ -44,6 +49,7 @@ public class Recording {
     }
 
     public void stopRecording() {
+        HandlerList.unregisterAll(this);
         if (runnable != null) {
             runnable.cancel();
         }
@@ -53,15 +59,20 @@ public class Recording {
     public void saveDemo() throws FileNotFoundException {
         new File("./demos/").mkdirs();
         PrintWriter out = new PrintWriter("./demos/" + fileName + ".dem");
-        for (Location l : locs) {
-            out.println(new BoxedLocation(l).toString());
+        for (String s : locs) {
+            out.println(s);
         }
         out.close();
         System.out.println("[Rec] Done writing.");
     }
 
-    public void play() {
-
+    @EventHandler
+    public void chat(AsyncPlayerChatEvent e) {
+        if (e.isCancelled())
+            return;
+        if (e.getPlayer().getName().equals(player.getName())) {
+            locs.add("$c:" + e.getMessage().replace(":", "[colon]"));
+        }
     }
 
 }

@@ -26,7 +26,7 @@ public class RecordingMain extends JavaPlugin {
         instance = this;
     }
 
-    @SuppressWarnings({ "resource", "deprecation" })
+    @SuppressWarnings({ "deprecation" })
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (label.equalsIgnoreCase("record")) {
             if (!(sender instanceof Player)) {
@@ -83,9 +83,21 @@ public class RecordingMain extends JavaPlugin {
                 return true;
             }
             if (args.length == 0) {
-                sender.sendMessage("Usage: playdemo filename");
+                sender.sendMessage("Usage: playdemo filename [scale]");
                 return true;
             }
+            double timescale = 1;
+            if (args.length > 1) {
+                try {
+                    timescale = Double.parseDouble(args[1]);
+                } catch (NumberFormatException ex) {
+                    timescale = 1;
+                }
+            }
+            if (timescale <= 0) {
+                timescale = 0.1;
+            }
+            timescale = Math.min(50, timescale);
             String file = args[0].replace("..", "");
             File f = new File("./demos/" + file + ".dem");
             if (!f.exists()) {
@@ -94,20 +106,10 @@ public class RecordingMain extends JavaPlugin {
             }
 
             try {
-                final Scanner i = new Scanner(new FileInputStream(f));
-
-                Bukkit.getScheduler().runTaskTimer(RecordingMain.getInstance(), new BukkitRunnable() {
-                    public void run() {
-                        if (i.hasNextLine()) {
-                            p.teleport(new BoxedLocation(i.nextLine()).unbox());
-                        } else {
-                            cancel();
-                            i.close();
-                        }
-                    }
-                }, 0, 1);
-
-            } catch (FileNotFoundException e) {
+                TimeScalePlayback b = new TimeScalePlayback(p, f, timescale);
+                b.start();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             return true;
@@ -123,8 +125,8 @@ public class RecordingMain extends JavaPlugin {
                 return true;
             }
             EntityType type = EntityType.VILLAGER;
-            for(EntityType t : EntityType.values()){
-                if(t.toString().replace("_", "").equalsIgnoreCase(args[1].replace("_", ""))){
+            for (EntityType t : EntityType.values()) {
+                if (t.toString().replace("_", "").equalsIgnoreCase(args[1].replace("_", ""))) {
                     type = t;
                 }
             }
@@ -146,8 +148,7 @@ public class RecordingMain extends JavaPlugin {
                 Bukkit.getScheduler().runTaskTimer(RecordingMain.getInstance(), new BukkitRunnable() {
                     public void run() {
                         if (i.hasNextLine()) {
-                            e.teleport(new BoxedLocation(i.nextLine()).unbox());
-                            e.setFallDistance(0);
+                            RecordingInterpreter.interpret(i.nextLine(), e);
                         } else {
                             e.remove();
                             i.close();
