@@ -7,22 +7,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 public class Recording implements Listener {
 
-    private ArrayList<String> locs = new ArrayList<String>();
+//    private ArrayList<String> locs = new ArrayList<String>();
 
-    public static final HashMap<String, Recording> current = new HashMap<String, Recording>();
+    public static final HashMap<String, FPSBasedRecording> current = new HashMap<String, FPSBasedRecording>();
 
-    public Player player;
+  /*  public Player player;
 
     private BukkitTask runnable;
 
@@ -74,5 +74,23 @@ public class Recording implements Listener {
             locs.add("$c:" + e.getMessage().replace(":", "[colon]"));
         }
     }
+    
+    @EventHandler
+    public void breake(BlockBreakEvent e) {
+        if (e.isCancelled())
+            return;
+        if (e.getPlayer().getName().equals(player.getName())) {
+            locs.add("$b:" + "AIR" + ";" + new BoxedLocation(e.getBlock().getLocation()).toString().replace(":", "[colon]"));
+        }
+    }
+    
+    @EventHandler
+    public void place(BlockBreakEvent e) {
+        if (e.isCancelled())
+            return;
+        if (e.getPlayer().getName().equals(player.getName())) {
+            locs.add("$b:" + e.getBlock().getType() + ";" + new BoxedLocation(e.getBlock().getLocation()).toString().replace(":", "[colon]"));
+        }
+    }*/
 
 }

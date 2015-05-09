@@ -30,7 +30,7 @@ public class TimeScalePlayback extends Thread {
 
             new BukkitRunnable() {
                 public void run() {
-                    RecordingInterpreter.interpret(line, entity);
+                    Playback.interpret(line, entity);
                 }
             }.runTask(RecordingMain.getInstance());
             try {

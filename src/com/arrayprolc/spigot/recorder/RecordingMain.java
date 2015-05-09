@@ -26,6 +26,14 @@ public class RecordingMain extends JavaPlugin {
         instance = this;
     }
 
+    public void onDisable() {
+        for (FPSBasedRecording rec : Recording.current.values()) {
+            rec.stopRecording();
+            rec = null;
+        }
+        Recording.current.clear();
+    }
+
     @SuppressWarnings({ "deprecation" })
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (label.equalsIgnoreCase("record")) {
@@ -34,7 +42,7 @@ public class RecordingMain extends JavaPlugin {
             }
             Player p = (Player) sender;
             if (Recording.current.containsKey(p.getUniqueId().toString())) {
-                sender.sendMessage("You are already recording!");
+                sender.sendMessage("You are already FPSBasedRecording!");
                 return true;
             }
             if (args.length == 0) {
@@ -42,12 +50,16 @@ public class RecordingMain extends JavaPlugin {
                 return true;
             }
             String fileName = args[0].replace("..", "").replace("/", "").replace("\\", "").replace(".", "");
-            Recording rec = new Recording();
-            rec.player = p;
-            rec.fileName = fileName;
+            /*
+             * FPSBasedRecording rec = new FPSBasedRecording(); rec.player = p;
+             * rec.fileName = fileName;
+             * 
+             * rec.startFPSBasedRecording();
+             */
+            FPSBasedRecording rec = new FPSBasedRecording(p, 1000, fileName);
+            rec.start();
             Recording.current.put(p.getUniqueId().toString(), rec);
-            rec.startRecording();
-            System.out.println("Started recording!");
+            System.out.println("Started FPSBasedRecording!");
             return true;
         }
 
@@ -57,18 +69,12 @@ public class RecordingMain extends JavaPlugin {
             }
             final Player p = (Player) sender;
             if (!Recording.current.containsKey(p.getUniqueId().toString())) {
-                sender.sendMessage("You are not recording!");
+                sender.sendMessage("You are not FPSBasedRecording!");
                 return true;
             }
-            Recording r = Recording.current.get(p.getUniqueId().toString());
+            FPSBasedRecording r = Recording.current.get(p.getUniqueId().toString());
             r.stopRecording();
-            System.out.println("Stopped recording.");
-            try {
-                r.saveDemo();
-                System.out.println("Saved demo!");
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
+            System.out.println("Stopped FPSBasedRecording.");
             Recording.current.remove(p.getUniqueId().toString());
             return true;
         }
@@ -79,7 +85,7 @@ public class RecordingMain extends JavaPlugin {
             }
             Player p = (Player) sender;
             if (Recording.current.containsKey(p.getUniqueId().toString())) {
-                sender.sendMessage("You are recording!");
+                sender.sendMessage("You are FPSBasedRecording!");
                 return true;
             }
             if (args.length == 0) {
@@ -132,7 +138,7 @@ public class RecordingMain extends JavaPlugin {
             }
             Entity e = p.getLocation().getWorld().spawnEntity(p.getLocation(), type);
             if (Recording.current.containsKey(p.getUniqueId().toString())) {
-                sender.sendMessage("You are recording!");
+                sender.sendMessage("You are FPSBasedRecording!");
                 return true;
             }
             String file = args[0].replace("..", "");
@@ -148,7 +154,7 @@ public class RecordingMain extends JavaPlugin {
                 Bukkit.getScheduler().runTaskTimer(RecordingMain.getInstance(), new BukkitRunnable() {
                     public void run() {
                         if (i.hasNextLine()) {
-                            RecordingInterpreter.interpret(i.nextLine(), e);
+                            Playback.interpret(i.nextLine(), e);
                         } else {
                             e.remove();
                             i.close();
