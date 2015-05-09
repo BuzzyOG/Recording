@@ -29,6 +29,9 @@ public class InputInterpreter {
 	private double y0 = 0;
 	private double z0 = 0;
 
+	private String active = "";
+	private int activeTally = 0;
+
 	// Variable tags
 	public static final String WORLD = "@w"; // Keeps track of the world and allows us to only
 	// need to write out the world if it changes
@@ -142,7 +145,14 @@ public class InputInterpreter {
 		if (output.length < 0)
 			return;
 		for (String s : output) {
-			data.add(s);
+			if (s.equals(active)) {
+				activeTally++;
+				continue;
+			} else {
+				data.add(active + (activeTally >= 2 ? ";" + activeTally : ""));
+				active = s;
+				activeTally = 0;
+			}
 		}
 	}
 
