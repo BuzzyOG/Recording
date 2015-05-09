@@ -136,7 +136,7 @@ public class RecordingMain extends JavaPlugin {
                     type = t;
                 }
             }
-            Entity e = p.getLocation().getWorld().spawnEntity(p.getLocation(), type);
+            final Entity e = p.getLocation().getWorld().spawnEntity(p.getLocation(), type);
             if (Recording.current.containsKey(p.getUniqueId().toString())) {
                 sender.sendMessage("You are FPSBasedRecording!");
                 return true;
