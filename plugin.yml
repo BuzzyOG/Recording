@@ -1,0 +1,8 @@
+name: RecordingTest
+version: 1.0.0
+main: com.arrayprolc.spigot.recorder.RecordingMain
+commands:
+    record: 
+    stoprec: 
+    playdemo: 
+    remoteplay: 
