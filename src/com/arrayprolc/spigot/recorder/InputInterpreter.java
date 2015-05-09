@@ -22,6 +22,7 @@ public class InputInterpreter {
 	private Stack<BlockState> stateChanges;
 
 	public static final char separator = ':';
+	public static final char iterations = ';';
 	public static final DecimalFormat FORMAT = new DecimalFormat("#.###");
 
 	private String lastWorld = "";
@@ -149,7 +150,7 @@ public class InputInterpreter {
 				activeTally++;
 				continue;
 			} else {
-				data.add(active + (activeTally >= 2 ? ";" + activeTally : ""));
+				data.add(active + (activeTally >= 2 ? iterations + activeTally : ""));
 				active = s;
 				activeTally = 0;
 			}

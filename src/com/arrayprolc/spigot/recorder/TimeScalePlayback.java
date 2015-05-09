@@ -3,6 +3,7 @@ package com.arrayprolc.spigot.recorder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.Scanner;
+import java.util.Stack;
 
 import org.apache.commons.codec.binary.Base64;
 import org.bukkit.Bukkit;
@@ -20,6 +21,7 @@ public class TimeScalePlayback extends Thread {
 	private World world;
 	private Location location;
 	private boolean running = false;
+	private Stack<String> queue;
 
 	public TimeScalePlayback(Entity entity, File demo, double scale) throws Exception {
 		sc = new Scanner(new FileInputStream(demo));
@@ -27,6 +29,7 @@ public class TimeScalePlayback extends Thread {
 		this.entity = entity;
 		this.world = Bukkit.getWorlds().get(0);
 		location = new Location(world, 0, 0, 0);
+		queue = new Stack<String>();
 	}
 
 	@SuppressWarnings("deprecation")
@@ -34,14 +37,16 @@ public class TimeScalePlayback extends Thread {
 	public synchronized void run() {
 		running = true;
 		while (running) {
-			if (sc.hasNextLine()) {
+			if (!queue.isEmpty()) {
+				execRaw(queue.pop());
+			} else if (sc.hasNextLine()) {
 				if (!entity.isValid()) {
 					stop();
 					return;
 				}
 				new BukkitRunnable() {
 					public void run() {
-						executeLine(sc.nextLine());
+						execRaw(sc.nextLine());
 					}
 				}.runTask(RecordingMain.getInstance());
 				try {
@@ -57,6 +62,24 @@ public class TimeScalePlayback extends Thread {
 		}
 		this.stop();
 		super.start();
+	}
+
+	private void execRaw(String line) {
+		if (!line.contains(InputInterpreter.iterations + "")) {
+			executeLine(line);
+		} else {
+			int top;
+			try {
+				top = Integer.parseInt(line.substring(line.indexOf(InputInterpreter.iterations) + 1));
+			} catch (Exception exc) {
+				top = 1;
+			}
+			line = line.substring(0, line.indexOf(InputInterpreter.iterations));
+			for (int i = 1; i < top; i++) {
+				queue.push(line);
+			}
+			execRaw(line);
+		}
 	}
 
 	@SuppressWarnings("deprecation")
