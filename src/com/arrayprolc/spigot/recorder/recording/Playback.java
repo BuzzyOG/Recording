@@ -1,4 +1,4 @@
-package com.arrayprolc.spigot.recorder;
+package com.arrayprolc.spigot.recorder.recording;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,7 +14,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class TimeScalePlayback extends Thread {
+import com.arrayprolc.spigot.recorder.RecordingPlugin;
+
+public class Playback extends Thread {
 	private final Scanner sc;
 	private long sleeptime;
 	private Entity entity;
@@ -23,7 +25,7 @@ public class TimeScalePlayback extends Thread {
 	private boolean running = false;
 	private Stack<String> queue;
 
-	public TimeScalePlayback(Entity entity, File demo, double scale) throws Exception {
+	public Playback(Entity entity, File demo, double scale) throws Exception {
 		sc = new Scanner(new FileInputStream(demo));
 		sleeptime = (long) (1000 / scale);
 		this.entity = entity;
@@ -49,7 +51,7 @@ public class TimeScalePlayback extends Thread {
 					public void run() {
 						execRaw(line);
 					}
-				}.runTask(RecordingMain.getInstance());
+				}.runTask(RecordingPlugin.getInstance());
 				try {
 					sleep(sleeptime);
 				} catch (InterruptedException e) {

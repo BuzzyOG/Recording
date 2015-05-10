@@ -1,4 +1,4 @@
-package com.arrayprolc.spigot.recorder;
+package com.arrayprolc.spigot.recorder.utils;
 
 import java.text.DecimalFormat;
 

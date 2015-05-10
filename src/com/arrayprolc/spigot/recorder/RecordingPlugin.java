@@ -10,15 +10,18 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class RecordingMain extends JavaPlugin {
+import com.arrayprolc.spigot.recorder.recording.Playback;
+import com.arrayprolc.spigot.recorder.recording.Recording;
 
-	public static final HashMap<String, FPSBasedRecording> recordings = new HashMap<String, FPSBasedRecording>();
-	public static final HashMap<String, TimeScalePlayback> playbacks = new HashMap<String, TimeScalePlayback>();
+public class RecordingPlugin extends JavaPlugin {
+
+	public static final HashMap<String, Recording> recordings = new HashMap<String, Recording>();
+	public static final HashMap<String, Playback> playbacks = new HashMap<String, Playback>();
 	private static final int DEFAULT_RECORD_FPS = 120;
 
-	private static RecordingMain instance;
+	private static RecordingPlugin instance;
 
-	public static RecordingMain getInstance() {
+	public static RecordingPlugin getInstance() {
 		return instance;
 	}
 
@@ -27,13 +30,13 @@ public class RecordingMain extends JavaPlugin {
 	}
 
 	public void onDisable() {
-		for (FPSBasedRecording rec : recordings.values()) {
+		for (Recording rec : recordings.values()) {
 			rec.stopRecording();
 			rec = null;
 		}
 		recordings.clear();
 
-		for (TimeScalePlayback playback : playbacks.values()) {
+		for (Playback playback : playbacks.values()) {
 			playback.stopPlayback();
 			playback = null;
 		}
@@ -56,14 +59,14 @@ public class RecordingMain extends JavaPlugin {
 				return true;
 			}
 			String fileName = args[0].replace("..", "").replace("/", "").replace("\\", "").replace(".", "");
-			int fps = RecordingMain.DEFAULT_RECORD_FPS;
+			int fps = RecordingPlugin.DEFAULT_RECORD_FPS;
 			if (args.length >= 2)
 				try {
 					fps = Integer.parseInt(args[1]);
 				} catch (Exception exc) {
 				}
 			fps = Math.min(fps, 1000);
-			FPSBasedRecording rec = new FPSBasedRecording(p, fps, fileName);
+			Recording rec = new Recording(p, fps, fileName);
 			rec.start();
 			recordings.put(p.getUniqueId().toString(), rec);
 			p.sendMessage("You are now recording \"" + fileName + "\" at " + fps + " FPS!");
@@ -79,7 +82,7 @@ public class RecordingMain extends JavaPlugin {
 				sender.sendMessage("You are not FPSBasedRecording!");
 				return true;
 			}
-			FPSBasedRecording r = recordings.get(p.getUniqueId().toString());
+			Recording r = recordings.get(p.getUniqueId().toString());
 			r.stopRecording();
 			System.out.println("Stopped FPSBasedRecording.");
 			recordings.remove(p.getUniqueId().toString());
@@ -119,7 +122,7 @@ public class RecordingMain extends JavaPlugin {
 			}
 
 			try {
-				TimeScalePlayback b = new TimeScalePlayback(p, f, timescale);
+				Playback b = new Playback(p, f, timescale);
 				b.start();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -155,7 +158,7 @@ public class RecordingMain extends JavaPlugin {
 				return true;
 			}
 			try {
-				TimeScalePlayback playback = new TimeScalePlayback(e, f, 1);
+				Playback playback = new Playback(e, f, 1);
 				playback.start();
 			} catch (Exception e1) {
 				// TODO Auto-generated catch block

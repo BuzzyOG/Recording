@@ -1,4 +1,4 @@
-package com.arrayprolc.spigot.recorder;
+package com.arrayprolc.spigot.recorder.recording;
 
 import java.io.FileNotFoundException;
 
@@ -12,7 +12,9 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class FPSBasedRecording extends Thread implements Listener {
+import com.arrayprolc.spigot.recorder.RecordingPlugin;
+
+public class Recording extends Thread implements Listener {
     private Player recorder;
     private boolean end = false;
     private final long sleeptime;
@@ -20,7 +22,7 @@ public class FPSBasedRecording extends Thread implements Listener {
     private final String saveFile;
     private final InputInterpreter interpreter;
 
-    public FPSBasedRecording(Player player, int fps, String saveFile) {
+    public Recording(Player player, int fps, String saveFile) {
         this.fps = fps;
         interpreter = new InputInterpreter(this);
         sleeptime = 1000 / fps;
@@ -35,7 +37,7 @@ public class FPSBasedRecording extends Thread implements Listener {
     @SuppressWarnings("deprecation")
     @Override
     public void run() {
-        Bukkit.getServer().getPluginManager().registerEvents(this, RecordingMain.getInstance());
+        Bukkit.getServer().getPluginManager().registerEvents(this, RecordingPlugin.getInstance());
         while (true) {
             if (end || interpreter == null) {
                 stop();
@@ -62,7 +64,7 @@ public class FPSBasedRecording extends Thread implements Listener {
                     }
                     interpreter.interpretLocation(recorder.getLocation());
                 }
-            }.runTask(RecordingMain.getInstance());
+            }.runTask(RecordingPlugin.getInstance());
             try {
                 sleep(sleeptime);
             } catch (Exception e) {

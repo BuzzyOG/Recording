@@ -1,4 +1,4 @@
-package com.arrayprolc.spigot.recorder;
+package com.arrayprolc.spigot.recorder.recording;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -50,7 +50,7 @@ public class InputInterpreter {
 	public static final String INFO = "@i"; // Used to indentify information, such as FPS
 
 	// Actual Class
-	public InputInterpreter(FPSBasedRecording recording) {
+	public InputInterpreter(Recording recording) {
 		this.data = new ArrayList<String>();
 		this.lastWorld = null;
 		stateChanges = new Stack<BlockState>();
