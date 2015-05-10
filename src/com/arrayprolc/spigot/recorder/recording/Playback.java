@@ -77,11 +77,11 @@ public class Playback extends Thread {
 			} catch (Exception exc) {
 				top = 1;
 			}
-			line = line.substring(0, line.indexOf(Interpreter.iterations));
+			String nl = line.substring(0, line.indexOf(Interpreter.iterations));
 			for (int i = 1; i < top; i++) {
-				queue.push(line);
+				queue.push(nl);
 			}
-			execRaw(line);
+			execRaw(nl);
 		}
 	}
 

@@ -1,6 +1,7 @@
 package com.arrayprolc.spigot.recorder;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 
 import org.bukkit.command.Command;
@@ -18,6 +19,7 @@ public class RecordingPlugin extends JavaPlugin {
 	public static final HashMap<String, Recording> recordings = new HashMap<String, Recording>();
 	public static final HashMap<String, Playback> playbacks = new HashMap<String, Playback>();
 	private static final int DEFAULT_RECORD_FPS = 120;
+	public static final DecimalFormat decimalFormat = new DecimalFormat("#.##");
 
 	private static RecordingPlugin instance;
 

@@ -17,13 +17,16 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.util.Vector;
 
+import com.arrayprolc.spigot.recorder.RecordingPlugin;
+
 public class Interpreter {
 	private ArrayList<String> data;
 	private Stack<BlockState> stateChanges;
 
 	public static final char separator = ':';
-	public static final char iterations = ';';
-	public static final DecimalFormat FORMAT = new DecimalFormat("#.###");
+	public static final char iterations = '#';
+
+	private final DecimalFormat FORMAT;
 
 	private String lastWorld = "";
 	private double x0 = 0;
@@ -51,6 +54,7 @@ public class Interpreter {
 
 	// Actual Class
 	public Interpreter(Recording recording) {
+		this.FORMAT = RecordingPlugin.decimalFormat;
 		this.data = new ArrayList<String>();
 		this.lastWorld = null;
 		stateChanges = new Stack<BlockState>();
@@ -94,17 +98,17 @@ public class Interpreter {
 		float p = Float.parseFloat(FORMAT.format(location.getPitch()));
 		// Check to see if the player is only looking around
 		if ((x - x0 != 0) || (y - y0 != 0) || (z - z0 != 0)) {
-			out(NEW_LOCATION + separator + vectorToString(x, y, z) + separator + a + separator + p);
 			x0 = x;
 			y0 = y;
 			z0 = z;
+			out(NEW_LOCATION + separator + vectorToString(x, y, z) + separator + a + separator + p);
 		} else {
 			out(CHANGE_VIEW + separator + FORMAT.format(a) + separator + FORMAT.format(p));
 		}
 	}
 
 	public void interpretChatEvent(AsyncPlayerChatEvent event) {
-		out(PLAYER_CHAT + separator + Base64.encodeBase64String(event.getMessage().getBytes()), "UTF-8");
+		out(PLAYER_CHAT + separator + Base64.encodeBase64String(event.getMessage().getBytes()));
 	}
 
 	@SuppressWarnings("deprecation")
@@ -150,7 +154,14 @@ public class Interpreter {
 				activeTally++;
 				continue;
 			} else {
-				data.add(active + (activeTally >= 2 ? iterations + activeTally : ""));
+				if (activeTally > 1) {
+					String str = active;
+					str += Interpreter.iterations;
+					str += activeTally;
+					data.add(str);
+				} else {
+					data.add(active);
+				}
 				active = s;
 				activeTally = 0;
 			}
@@ -159,8 +170,8 @@ public class Interpreter {
 
 	public void save(String saveFile) throws FileNotFoundException {
 		new File("./demos/").mkdirs();
-		PrintWriter out = new PrintWriter("./demos/" + saveFile + ".dem");
 		out("");
+		PrintWriter out = new PrintWriter("./demos/" + saveFile + ".dem");
 		for (String s : data) {
 			out.println(s);
 		}
