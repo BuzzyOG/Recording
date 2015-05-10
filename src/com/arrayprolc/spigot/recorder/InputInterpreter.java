@@ -104,7 +104,7 @@ public class InputInterpreter {
 	}
 
 	public void interpretChatEvent(AsyncPlayerChatEvent event) {
-		out(PLAYER_CHAT + separator + Base64.encodeBase64String(event.getMessage().getBytes()));
+		out(PLAYER_CHAT + separator + Base64.encodeBase64String(event.getMessage().getBytes()), "UTF-8");
 	}
 
 	@SuppressWarnings("deprecation")
@@ -160,6 +160,7 @@ public class InputInterpreter {
 	public void save(String saveFile) throws FileNotFoundException {
 		new File("./demos/").mkdirs();
 		PrintWriter out = new PrintWriter("./demos/" + saveFile + ".dem");
+		out("");
 		for (String s : data) {
 			out.println(s);
 		}

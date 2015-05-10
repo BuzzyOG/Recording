@@ -17,7 +17,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class TimeScalePlayback extends Thread {
 	private final Scanner sc;
 	private long sleeptime;
-	private final Entity entity;
+	private Entity entity;
 	private World world;
 	private Location location;
 	private boolean running = false;
@@ -25,7 +25,7 @@ public class TimeScalePlayback extends Thread {
 
 	public TimeScalePlayback(Entity entity, File demo, double scale) throws Exception {
 		sc = new Scanner(new FileInputStream(demo));
-		sleeptime = (long) (50 / scale);
+		sleeptime = (long) (1000 / scale);
 		this.entity = entity;
 		this.world = Bukkit.getWorlds().get(0);
 		location = new Location(world, 0, 0, 0);
@@ -37,16 +37,17 @@ public class TimeScalePlayback extends Thread {
 	public synchronized void run() {
 		running = true;
 		while (running) {
+			if (!entity.isValid()) {
+				stop();
+				return;
+			}
 			if (!queue.isEmpty()) {
 				execRaw(queue.pop());
 			} else if (sc.hasNextLine()) {
-				if (!entity.isValid()) {
-					stop();
-					return;
-				}
+				final String line = sc.nextLine();
 				new BukkitRunnable() {
 					public void run() {
-						execRaw(sc.nextLine());
+						execRaw(line);
 					}
 				}.runTask(RecordingMain.getInstance());
 				try {
@@ -116,13 +117,13 @@ public class TimeScalePlayback extends Thread {
 				brk.setX(Double.parseDouble(data[1]));
 				brk.setY(Double.parseDouble(data[2]));
 				brk.setZ(Double.parseDouble(data[3]));
-				brk.getBlock().breakNaturally();
+				brk.getBlock().setType(Material.AIR);
 				break;
 			case InputInterpreter.PLAYER_CHAT:
 				if (!(entity instanceof Player))
 					return;
-				String message = Base64.decodeBase64(data[1]).toString();
-				((Player) entity).sendMessage(message);
+				String message = new String(Base64.decodeBase64(data[1]), "UTF-8");
+				((Player) entity).chat(message);
 				break;
 			case InputInterpreter.INFO:
 				parseInfo(data[1]);
@@ -147,5 +148,20 @@ public class TimeScalePlayback extends Thread {
 		} else {
 
 		}
+	}
+
+	public void stopPlayback() {
+		queue.clear();
+		int skipped = 0;
+		while (sc.hasNext()) {
+			sc.nextLine();
+			skipped++;
+		}
+		System.out.println("Playback stopped. Skipping " + skipped + " unparsed lines.");
+		sc.close();
+		entity = null;
+		world = null;
+		location = null;
+		running = false;
 	}
 }
