@@ -17,7 +17,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.util.Vector;
 
-public class InputInterpreter {
+public class Interpreter {
 	private ArrayList<String> data;
 	private Stack<BlockState> stateChanges;
 
@@ -50,7 +50,7 @@ public class InputInterpreter {
 	public static final String INFO = "@i"; // Used to indentify information, such as FPS
 
 	// Actual Class
-	public InputInterpreter(Recording recording) {
+	public Interpreter(Recording recording) {
 		this.data = new ArrayList<String>();
 		this.lastWorld = null;
 		stateChanges = new Stack<BlockState>();

@@ -20,17 +20,17 @@ public class Recording extends Thread implements Listener {
     private final long sleeptime;
     private final int fps;
     private final String saveFile;
-    private final InputInterpreter interpreter;
+    private final Interpreter interpreter;
 
     public Recording(Player player, int fps, String saveFile) {
         this.fps = fps;
-        interpreter = new InputInterpreter(this);
+        interpreter = new Interpreter(this);
         sleeptime = 1000 / fps;
         recorder = player;
         this.saveFile = saveFile;
     }
 
-    public InputInterpreter getInterpreter() {
+    public Interpreter getInterpreter() {
         return interpreter;
     }
 

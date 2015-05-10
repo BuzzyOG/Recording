@@ -68,16 +68,16 @@ public class Playback extends Thread {
 	}
 
 	private void execRaw(String line) {
-		if (!line.contains(InputInterpreter.iterations + "")) {
+		if (!line.contains(Interpreter.iterations + "")) {
 			executeLine(line);
 		} else {
 			int top;
 			try {
-				top = Integer.parseInt(line.substring(line.indexOf(InputInterpreter.iterations) + 1));
+				top = Integer.parseInt(line.substring(line.indexOf(Interpreter.iterations) + 1));
 			} catch (Exception exc) {
 				top = 1;
 			}
-			line = line.substring(0, line.indexOf(InputInterpreter.iterations));
+			line = line.substring(0, line.indexOf(Interpreter.iterations));
 			for (int i = 1; i < top; i++) {
 				queue.push(line);
 			}
@@ -88,24 +88,24 @@ public class Playback extends Thread {
 	@SuppressWarnings("deprecation")
 	private void executeLine(String line) {
 		try {
-			String[] data = line.split(InputInterpreter.separator + "");
+			String[] data = line.split(Interpreter.separator + "");
 			switch (data[0]) {
-			case InputInterpreter.WORLD:
+			case Interpreter.WORLD:
 				this.world = Bukkit.getWorld(data[1]);
 				location.setWorld(world);
 				break;
-			case InputInterpreter.NEW_LOCATION:
+			case Interpreter.NEW_LOCATION:
 				location.setX(Double.parseDouble(data[1]));
 				location.setY(Double.parseDouble(data[2]));
 				location.setZ(Double.parseDouble(data[3]));
 				entity.teleport(location);
 				break;
-			case InputInterpreter.CHANGE_VIEW:
+			case Interpreter.CHANGE_VIEW:
 				location.setYaw(Float.parseFloat(data[1]));
 				location.setPitch(Float.parseFloat(data[2]));
 				entity.teleport(location);
 				break;
-			case InputInterpreter.BLOCK_PLACE:
+			case Interpreter.BLOCK_PLACE:
 				Location place = location.clone();
 				place.setX(Double.parseDouble(data[1]));
 				place.setY(Double.parseDouble(data[2]));
@@ -114,23 +114,23 @@ public class Playback extends Thread {
 				byte raw = (byte) Integer.parseInt(data[5]);
 				place.getBlock().setTypeIdAndData(material.getId(), raw, true);
 				break;
-			case InputInterpreter.BLOCK_BREAK:
+			case Interpreter.BLOCK_BREAK:
 				Location brk = location.clone();
 				brk.setX(Double.parseDouble(data[1]));
 				brk.setY(Double.parseDouble(data[2]));
 				brk.setZ(Double.parseDouble(data[3]));
 				brk.getBlock().setType(Material.AIR);
 				break;
-			case InputInterpreter.PLAYER_CHAT:
+			case Interpreter.PLAYER_CHAT:
 				if (!(entity instanceof Player))
 					return;
 				String message = new String(Base64.decodeBase64(data[1]), "UTF-8");
 				((Player) entity).chat(message);
 				break;
-			case InputInterpreter.INFO:
+			case Interpreter.INFO:
 				parseInfo(data[1]);
 				break;
-			case InputInterpreter.HOTBAR_POSTITION:
+			case Interpreter.HOTBAR_POSTITION:
 				if (!(entity instanceof Player))
 					return;
 				((Player) entity).getInventory().setHeldItemSlot(Integer.parseInt(data[1]));
